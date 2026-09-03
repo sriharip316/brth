@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,7 +15,19 @@ import (
 	"github.com/srihari/brth/internal/ui"
 )
 
-var version = "1.0.0"
+var version = "dev"
+
+func getVersion() string {
+	if version != "dev" && version != "" {
+		return version
+	}
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		if bi.Main.Version != "" && bi.Main.Version != "(devel)" {
+			return bi.Main.Version
+		}
+	}
+	return version
+}
 
 func main() {
 	var (
@@ -72,7 +85,7 @@ func main() {
 	}
 
 	if flagVersion {
-		fmt.Printf("brth version %s\n", version)
+		fmt.Printf("brth version %s\n", getVersion())
 		os.Exit(0)
 	}
 

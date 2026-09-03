@@ -11,6 +11,9 @@
 *.out
 coverage.txt
 
+# Release artifacts
+dist/
+
 # Editor and IDE configurations
 .idea/
 .vscode/
