@@ -212,16 +212,19 @@ func (m Model) renderHeader() string {
 
 func (m Model) renderCircleArea() string {
 	// Allocate available vertical space to circle
-	circleHeight := m.Height - 13
+	circleHeight := m.Height - 11
 	if circleHeight > 22 {
 		circleHeight = 22
 	} else if circleHeight < 9 {
 		circleHeight = 9
 	}
 
-	circleWidth := int(float64(circleHeight) * m.Config.AspectRatio * 1.5)
-	if circleWidth > m.Width-6 {
-		circleWidth = m.Width - 6
+	circleWidth := int(float64(circleHeight)*m.Config.AspectRatio) + 4
+	if circleWidth > m.Width-4 {
+		circleWidth = m.Width - 4
+	}
+	if circleWidth < 20 {
+		circleWidth = 20
 	}
 
 	factor := m.Engine.CurrentRadiusFactor()

@@ -74,17 +74,29 @@ func renderBraille(cellWidth, cellHeight int, factor float64, filled bool, cfg C
 	cx := float64(dotW) / 2.0
 	cy := float64(dotH) / 2.0
 
-	maxRadius := math.Min(cx-2, (cy-2)*cfg.AspectRatio)
+	// Each braille character has 2 dots horizontally and 4 dots vertically.
+	// In a terminal where cell height is AspectRatio times cell width (typically ~2.0),
+	// the aspect ratio of each individual braille dot is AspectRatio / (4/2) = AspectRatio / 2.0.
+	dotAspect := cfg.AspectRatio / 2.0
+	if dotAspect <= 0 {
+		dotAspect = 1.0
+	}
+
+	margin := 3.0
+	maxRadius := math.Min(cx-margin, (cy-margin)*dotAspect)
 	if maxRadius < 6 {
 		maxRadius = 6
 	}
-	minRadius := maxRadius * 0.32
-	if minRadius < 5 {
-		minRadius = 5
+	minRadius := maxRadius * 0.35
+	if minRadius < 4 {
+		minRadius = 4
+	}
+	if minRadius >= maxRadius {
+		minRadius = maxRadius * 0.5
 	}
 
 	radius := minRadius + factor*(maxRadius-minRadius)
-	thickness := 1.8 + factor*0.8
+	thickness := 1.5 + factor*0.5
 
 	// Sub-pixel grid
 	dots := make([][]bool, dotH)
@@ -92,7 +104,7 @@ func renderBraille(cellWidth, cellHeight int, factor float64, filled bool, cfg C
 		dots[y] = make([]bool, dotW)
 		for x := 0; x < dotW; x++ {
 			dx := float64(x) - cx
-			dy := (float64(y) - cy) / cfg.AspectRatio
+			dy := (float64(y) - cy) * dotAspect
 			dist := math.Sqrt(dx*dx + dy*dy)
 
 			if filled {
@@ -109,14 +121,14 @@ func renderBraille(cellWidth, cellHeight int, factor float64, filled bool, cfg C
 
 	// Prepare cell character grid
 	grid := make([][]rune, cellHeight)
-	for cy := 0; cy < cellHeight; cy++ {
-		grid[cy] = make([]rune, cellWidth)
-		for cx := 0; cx < cellWidth; cx++ {
+	for cyCell := 0; cyCell < cellHeight; cyCell++ {
+		grid[cyCell] = make([]rune, cellWidth)
+		for cxCell := 0; cxCell < cellWidth; cxCell++ {
 			var r rune = 0x2800
 			for dy := 0; dy < 4; dy++ {
-				py := cy*4 + dy
+				py := cyCell*4 + dy
 				for dx := 0; dx < 2; dx++ {
-					px := cx*2 + dx
+					px := cxCell*2 + dx
 					if py < dotH && px < dotW && dots[py][px] {
 						r |= brailleDotMap[dy][dx]
 					}
@@ -125,7 +137,7 @@ func renderBraille(cellWidth, cellHeight int, factor float64, filled bool, cfg C
 			if r == 0x2800 {
 				r = ' '
 			}
-			grid[cy][cx] = r
+			grid[cyCell][cxCell] = r
 		}
 	}
 
@@ -151,13 +163,17 @@ func renderBlock(cellWidth, cellHeight int, factor float64, cfg CircleConfig) st
 	cx := float64(cellWidth) / 2.0
 	cy := float64(cellHeight) / 2.0
 
-	maxRadius := math.Min(cx-2, (cy-1)*cfg.AspectRatio)
+	margin := 1.5
+	maxRadius := math.Min(cx-margin*2, (cy-margin)*cfg.AspectRatio)
 	if maxRadius < 4 {
 		maxRadius = 4
 	}
-	minRadius := maxRadius * 0.30
+	minRadius := maxRadius * 0.35
 	if minRadius < 3 {
 		minRadius = 3
+	}
+	if minRadius >= maxRadius {
+		minRadius = maxRadius * 0.5
 	}
 
 	radius := minRadius + factor*(maxRadius-minRadius)
@@ -204,11 +220,19 @@ func renderASCII(cellWidth, cellHeight int, factor float64, cfg CircleConfig) st
 	cx := float64(cellWidth) / 2.0
 	cy := float64(cellHeight) / 2.0
 
-	maxRadius := math.Min(cx-2, (cy-1)*cfg.AspectRatio)
+	margin := 1.5
+	maxRadius := math.Min(cx-margin*2, (cy-margin)*cfg.AspectRatio)
 	if maxRadius < 4 {
 		maxRadius = 4
 	}
-	minRadius := maxRadius * 0.30
+	minRadius := maxRadius * 0.35
+	if minRadius < 3 {
+		minRadius = 3
+	}
+	if minRadius >= maxRadius {
+		minRadius = maxRadius * 0.5
+	}
+
 	radius := minRadius + factor*(maxRadius-minRadius)
 	thickness := 1.2
 

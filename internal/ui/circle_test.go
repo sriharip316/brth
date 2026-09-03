@@ -60,3 +60,47 @@ func TestNextThemeAndStyle(t *testing.T) {
 		t.Errorf("expected NextStyle to advance from braille-ring")
 	}
 }
+
+func TestCircleContainedAndRound(t *testing.T) {
+	cfg := CircleConfig{
+		Style:       "braille-ring",
+		AspectRatio: 2.0,
+		Theme:       GetTheme("calm"),
+	}
+
+	for _, factor := range []float64{0.0, 0.5, 1.0} {
+		out := RenderCircle(36, 14, factor, cfg)
+		lines := strings.Split(out, "\n")
+		if len(lines) != 14 {
+			t.Errorf("expected 14 lines, got %d", len(lines))
+		}
+
+		// At factor 1.0 (max expansion), ensure top and bottom arcs exist
+		// (i.e. not clipped off into vertical brackets)
+		if factor == 1.0 {
+			// Row 1 or 2 should have characters for the top arc
+			topFound := false
+			for r := 0; r <= 2; r++ {
+				if strings.TrimSpace(lines[r]) != "" {
+					topFound = true
+					break
+				}
+			}
+			if !topFound {
+				t.Errorf("expected top arc within top rows for factor 1.0")
+			}
+
+			// Row 11, 12, or 13 should have characters for the bottom arc
+			bottomFound := false
+			for r := 11; r < 14; r++ {
+				if strings.TrimSpace(lines[r]) != "" {
+					bottomFound = true
+					break
+				}
+			}
+			if !bottomFound {
+				t.Errorf("expected bottom arc within bottom rows for factor 1.0")
+			}
+		}
+	}
+}
