@@ -1,0 +1,31 @@
+# Binaries
+/brth
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*.test
+*.out
+coverage.txt
+
+# Editor and IDE configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Local configuration overrides
+.brth.yaml
+
+# Local screenshots and temp media
+*.png
+*.jpg
+*.jpeg
