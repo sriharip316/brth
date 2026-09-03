@@ -5,28 +5,26 @@
 `brth` is an aesthetically refined CLI breathwork application designed to help you relax, focus, or sleep right inside your terminal.
 
 ```
-                  ╭─────────────────────────────────────╮
-                  │       ✦  Box Breathing  ✦           │
-                  │             [4-4-4-4]               │
-                  ╰─────────────────────────────────────╯
+                              ✦  box  ✦
+                              [4-4-4-4]
 
-                                ⢀⣀⣀⣀⡀
-                         ⢀⣠⣴⠾⠛⠉⠉⠉⠉⠛⠷⣦⣄⡀
-                      ⢀⣴⠟⠉                      ⠉⠻⣦⡀
-                    ⢠⡿⠁                              ⠈⢿⡄
-                   ⣰⡿      ╭──────────────────╮      ⢿⣆
-                  ⢰⣿       │      INHALE      │       ⣿⡆
-                  ⢸⣿       │       2.8s       │       ⣿⡇
-                  ⠸⣿       ╰──────────────────╯      ⣿⠇
-                   ⣻⣆                              ⣰⡿
-                    ⠹⣷⣄                         ⣠⣾⠏
-                      ⠙⠻⢶⣤⣀⣀        ⣀⣀⣤⡶⠟⠋
-                          ⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉
+                            ⣀⣀⣀⣀⣀⣀⡀
+                        ⢀⣴⣾⣿⠿⠟⠛⠛⠛⠿⢿⣿⣶⣄
+                      ⢀⣾⣿⠟⠉        ⠈⠙⢿⣿⣆
+                     ⣰⣿⡟⠁             ⠙⣿⣷⡀
+                    ⢠⣿⡟                ⠘⣿⣧
+                    ⢸⣿⠁     INHALE      ⢹⣿
+                    ⢸⣿                  ⢸⣿
+                    ⠸⣿⣇      2.8s      ⢀⣿⡿
+                     ⢻⣿⣆              ⢀⣾⣿⠃
+                      ⠙⣿⣷⣄          ⢀⣴⣿⡟⠁
+                       ⠈⠙⢿⣿⣶⣤⣄⣀⣀⣀⣤⣴⣾⣿⠟⠉
+                          ⠈⠉⠛⠛⠛⠛⠛⠛⠋⠉
 
-                   Breathe in deeply through your nose...
-                  ━━━━━━━━━━━─────────────────────  2.8s / 4.0s
-                  Cycle 1 / 4  •  00:15  •  100% pace  •  calm (braille-ring)
-       [Space] Pause   [p] Preset   [+/-] Pace   [t] Theme   [s] Style   [?] Help   [q] Quit
+                Breathe in deeply through your nose...
+            ━━━━━━━━━━━─────────────────────  2.8s / 4.0s
+           Cycle 1 / 4  •  00:15  •  100% pace  •  calm (braille-ring)
+[Space] Pause   [p] Preset   [+/-] Pace   [t] Theme   [s] Style   [?] Help   [q] Quit
 ```
 
 ---
