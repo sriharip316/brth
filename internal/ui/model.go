@@ -7,9 +7,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/srihari/brth/internal/breath"
-	"github.com/srihari/brth/internal/config"
-	"github.com/srihari/brth/internal/preset"
+	"github.com/sriharip316/brth/internal/breath"
+	"github.com/sriharip316/brth/internal/config"
+	"github.com/sriharip316/brth/internal/preset"
 )
 
 type tickMsg time.Time

@@ -10,9 +10,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/pflag"
 
-	"github.com/srihari/brth/internal/config"
-	"github.com/srihari/brth/internal/preset"
-	"github.com/srihari/brth/internal/ui"
+	"github.com/sriharip316/brth/internal/config"
+	"github.com/sriharip316/brth/internal/preset"
+	"github.com/sriharip316/brth/internal/ui"
 )
 
 var version = "dev"

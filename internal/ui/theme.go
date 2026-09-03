@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/srihari/brth/internal/breath"
+	"github.com/sriharip316/brth/internal/breath"
 )
 
 // Theme defines colors for the application UI.

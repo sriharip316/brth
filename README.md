@@ -48,7 +48,7 @@
 Ensure you have [Go](https://golang.org) 1.22+ installed:
 
 ```bash
-git clone https://github.com/srihari/brth.git
+git clone https://github.com/sriharip316/brth.git
 cd brth
 go build -o brth .
 ```

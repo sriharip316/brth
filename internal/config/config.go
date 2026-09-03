@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/srihari/brth/internal/preset"
+	"github.com/sriharip316/brth/internal/preset"
 	"gopkg.in/yaml.v3"
 )
 

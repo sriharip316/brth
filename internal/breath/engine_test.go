@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/srihari/brth/internal/preset"
+	"github.com/sriharip316/brth/internal/preset"
 )
 
 func TestEngineBoxProgression(t *testing.T) {

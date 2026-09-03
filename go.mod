@@ -1,4 +1,4 @@
-module github.com/srihari/brth
+module github.com/sriharip316/brth
 
 go 1.26.4
 

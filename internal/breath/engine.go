@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/srihari/brth/internal/preset"
+	"github.com/sriharip316/brth/internal/preset"
 )
 
 // Phase denotes the active breathing phase.
