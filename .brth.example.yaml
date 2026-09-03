@@ -1,0 +1,52 @@
+# ~/.brth.yaml - Configuration for brth CLI breathing app
+# Copy this file to $HOME/.brth.yaml or run: brth --init-config
+
+# Default preset to start if not specified on the command line
+default_preset: "box"
+
+# Color theme: calm, sunset, forest, nord, ocean, mono
+theme: "calm"
+
+# Animation visual style: braille-ring, braille-fill, block, ascii
+style: "braille-ring"
+
+# Animation refresh rate in frames per second (15 to 60)
+fps: 30
+
+# Character aspect ratio correction (width / height ratio of terminal font)
+# Default 2.0 works well for standard terminal fonts
+aspect_ratio: 2.0
+
+# Sound notification (terminal bell) on phase changes
+sound: false
+
+# Preparation countdown seconds before starting cycle (0 to disable)
+prep_seconds: 3
+
+# Custom user presets
+# Durations are in seconds (can be fractional, e.g. 5.5)
+# Cycles set to 0 runs continuously until stopped
+presets:
+  - name: "my-zen"
+    description: "Personal deep relaxation rhythm"
+    inhale: 4.0
+    hold_in: 4.0
+    exhale: 6.0
+    hold_out: 2.0
+    cycles: 10
+
+  - name: "quick-reset"
+    description: "3-minute stress reset"
+    inhale: 4.0
+    hold_in: 0.0
+    exhale: 6.0
+    hold_out: 0.0
+    cycles: 18
+
+  - name: "power-flow"
+    description: "Energizing morning flow"
+    inhale: 3.0
+    hold_in: 1.0
+    exhale: 3.0
+    hold_out: 1.0
+    cycles: 20
