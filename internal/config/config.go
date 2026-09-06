@@ -188,7 +188,7 @@ presets:
 }
 
 // GenerateDefaultConfigFile writes a documented default ~/.brth.yaml.
-func GenerateDefaultConfigFile(path string) error {
+func GenerateDefaultConfigFile(path string) (err error) {
 	if path == "" {
 		var err error
 		path, err = DefaultConfigPath()
@@ -211,7 +211,11 @@ func GenerateDefaultConfigFile(path string) error {
 		}
 		return fmt.Errorf("failed to create config file %s: %w", path, err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
 	if _, err := io.WriteString(f, SampleConfigContent()); err != nil {
 		return fmt.Errorf("failed to write default config to %s: %w", path, err)
