@@ -13,7 +13,7 @@ style: "braille-ring"
 # Animation refresh rate in frames per second (15 to 60)
 fps: 30
 
-# Character aspect ratio correction (width / height ratio of terminal font)
+# Character aspect ratio correction (height / width ratio of terminal font)
 # Default 2.0 works well for standard terminal fonts
 aspect_ratio: 2.0
 

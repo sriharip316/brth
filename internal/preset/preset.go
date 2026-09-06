@@ -2,6 +2,7 @@ package preset
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -134,8 +135,28 @@ func (p Preset) TotalCycleDuration() float64 {
 	return p.Inhale + p.HoldIn + p.Exhale + p.HoldOut
 }
 
+// presetNameRe constrains preset names to a safe identifier charset. Names
+// come from user config files and are echoed to the terminal, so they must
+// not be able to carry terminal escape sequences.
+var presetNameRe = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9 _.\-]{0,31}$`)
+
+// SanitizeControlChars strips terminal control runes (C0 and C1, including
+// ESC) from config-supplied text so it cannot inject escape sequences when
+// rendered.
+func SanitizeControlChars(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r < 0x20 || (r >= 0x7f && r <= 0x9f) {
+			return -1
+		}
+		return r
+	}, s)
+}
+
 // Validate verifies that the preset has sensible durations.
 func (p Preset) Validate() error {
+	if !presetNameRe.MatchString(p.Name) {
+		return fmt.Errorf("preset name must be 1-32 characters of letters, digits, spaces, '.', '_', or '-'")
+	}
 	if p.Inhale <= 0 {
 		return fmt.Errorf("inhale duration must be greater than 0")
 	}

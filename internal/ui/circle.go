@@ -26,6 +26,11 @@ type CircleConfig struct {
 // AvailableStyles lists valid rendering styles.
 var AvailableStyles = []string{"braille-ring", "braille-fill", "block", "ascii"}
 
+// minCircleHeight is the smallest canvas the circle renderers support. It is
+// shared with renderCircleArea so that the composed view (6 rows of chrome
+// plus the circle) fits the minimum window height enforced by Model.View.
+const minCircleHeight = 8
+
 // NextStyle returns the next rendering style cyclically.
 func NextStyle(current string) string {
 	current = strings.ToLower(strings.TrimSpace(current))
@@ -45,8 +50,8 @@ func RenderCircle(width, height int, factor float64, cfg CircleConfig) string {
 	if width < 20 {
 		width = 20
 	}
-	if height < 10 {
-		height = 10
+	if height < minCircleHeight {
+		height = minCircleHeight
 	}
 
 	if cfg.AspectRatio <= 0 {

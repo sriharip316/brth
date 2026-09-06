@@ -115,6 +115,53 @@ func TestEnginePause(t *testing.T) {
 	}
 }
 
+func TestEngineNoHoldOutExactCycleCount(t *testing.T) {
+	// Presets without a hold-out (4-7-8, coherent, triangle, ...) must count
+	// each breath exactly once: the cycle boundary fires when leaving Exhale.
+	p := preset.Preset{Name: "fast", Inhale: 1.0, Exhale: 1.0, HoldOut: 0.0}
+
+	engine := NewEngine(p, 0, 3)
+	now := time.Now()
+	for i := 0; i < 100 && engine.CurrentPhase != PhaseDone; i++ {
+		now = now.Add(600 * time.Millisecond)
+		engine.Update(now)
+	}
+
+	if engine.CurrentPhase != PhaseDone {
+		t.Fatalf("expected session to complete, got phase %v", engine.CurrentPhase)
+	}
+	if engine.CurrentCycle != 3 {
+		t.Fatalf("expected exactly 3 cycles, engine counted %d", engine.CurrentCycle)
+	}
+}
+
+func TestSetPresetRecomputesTargetCycles(t *testing.T) {
+	continuous := preset.Preset{Name: "cont", Inhale: 1.0, Exhale: 1.0}
+	limited := preset.Preset{Name: "limited", Inhale: 1.0, Exhale: 1.0, Cycles: 4}
+
+	engine := NewEngine(continuous, 0, 0)
+	if engine.TargetCycles != 0 {
+		t.Fatalf("expected continuous session, got target cycles %d", engine.TargetCycles)
+	}
+
+	engine.SetPreset(limited, 0)
+	if engine.TargetCycles != 4 {
+		t.Fatalf("expected 4 target cycles after switching, got %d", engine.TargetCycles)
+	}
+
+	// Switching back to a continuous preset must not inherit the old limit.
+	engine.SetPreset(continuous, 0)
+	if engine.TargetCycles != 0 {
+		t.Fatalf("expected continuous after switching back, got %d", engine.TargetCycles)
+	}
+
+	// An explicit CLI override outranks the preset's own cycle count.
+	engine.SetPreset(continuous, 7)
+	if engine.TargetCycles != 7 {
+		t.Fatalf("expected override of 7 cycles, got %d", engine.TargetCycles)
+	}
+}
+
 func TestCurrentRadiusFactor(t *testing.T) {
 	p := preset.Preset{Name: "test", Inhale: 2.0, HoldIn: 2.0, Exhale: 2.0, HoldOut: 2.0}
 	engine := NewEngine(p, 0, 0)

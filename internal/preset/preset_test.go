@@ -109,8 +109,30 @@ func TestPresetValidation(t *testing.T) {
 		t.Errorf("expected error for negative hold")
 	}
 
+	invalidName := Preset{Name: "bad\x1b[2Jname", Inhale: 4, Exhale: 4}
+	if err := invalidName.Validate(); err == nil {
+		t.Errorf("expected error for name with control characters")
+	}
+
+	emptyName := Preset{Name: "", Inhale: 4, Exhale: 4}
+	if err := emptyName.Validate(); err == nil {
+		t.Errorf("expected error for empty preset name")
+	}
+
 	valid := Preset{Name: "good", Inhale: 4, Exhale: 4, HoldIn: 0, HoldOut: 0}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("unexpected error for valid preset: %v", err)
+	}
+}
+
+func TestSanitizeControlChars(t *testing.T) {
+	// C0 controls (ESC, BEL), DEL, and C1 controls must all be stripped.
+	in := "es\x1bcape\x07de\x7fscri\u009bption"
+	want := "escapedescription"
+	if got := SanitizeControlChars(in); got != want {
+		t.Errorf("SanitizeControlChars(%q) = %q, want %q", in, got, want)
+	}
+	if got := SanitizeControlChars("clean 4-7-8 text"); got != "clean 4-7-8 text" {
+		t.Errorf("SanitizeControlChars altered clean text: %q", got)
 	}
 }

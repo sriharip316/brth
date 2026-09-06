@@ -90,6 +90,55 @@ presets:
 	}
 }
 
+func TestClampFPS(t *testing.T) {
+	cases := []struct{ in, want int }{
+		{0, 30}, {-5, 30}, {1, 15}, {10, 15}, {15, 15},
+		{30, 30}, {60, 60}, {61, 60}, {120, 60}, {5000, 60},
+	}
+	for _, c := range cases {
+		if got := ClampFPS(c.in); got != c.want {
+			t.Errorf("ClampFPS(%d) = %d, want %d", c.in, got, c.want)
+		}
+	}
+}
+
+func TestLoadSanitizesControlChars(t *testing.T) {
+	yamlContent := `
+theme: "cal\x1bm"
+style: "bra\x07ille-ring"
+presets:
+  - name: "es\x1bcape"
+    description: "de\x1bscription"
+    inhale: 4
+    exhale: 4
+`
+	tmpFile := filepath.Join(t.TempDir(), "test.yaml")
+	if err := os.WriteFile(tmpFile, []byte(yamlContent), 0644); err != nil {
+		t.Fatalf("failed to write test file: %v", err)
+	}
+
+	cfg, err := Load(tmpFile)
+	if err != nil {
+		t.Fatalf("unexpected error loading config: %v", err)
+	}
+
+	if cfg.Theme != "calm" {
+		t.Errorf("expected sanitized theme 'calm', got %q", cfg.Theme)
+	}
+	if cfg.Style != "braille-ring" {
+		t.Errorf("expected sanitized style 'braille-ring', got %q", cfg.Style)
+	}
+	if len(cfg.Presets) != 1 {
+		t.Fatalf("expected 1 preset, got %d", len(cfg.Presets))
+	}
+	if cfg.Presets[0].Name != "escape" {
+		t.Errorf("expected sanitized name 'escape', got %q", cfg.Presets[0].Name)
+	}
+	if cfg.Presets[0].Description != "description" {
+		t.Errorf("expected sanitized description 'description', got %q", cfg.Presets[0].Description)
+	}
+}
+
 func TestGenerateDefaultConfigFile(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), ".brth.yaml")
 

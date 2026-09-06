@@ -80,6 +80,13 @@ func NewEngine(p preset.Preset, prepSeconds int, targetCycles int) *Engine {
 		targetCycles = p.Cycles
 	}
 
+	// Guard against degenerate presets: advancePhase's zero-duration skip
+	// loop would never terminate if every phase had zero length.
+	if p.Inhale <= 0 && p.HoldIn <= 0 && p.Exhale <= 0 && p.HoldOut <= 0 {
+		p.Inhale = 4.0
+		p.Exhale = 4.0
+	}
+
 	e := &Engine{
 		Preset:       p,
 		PrepDuration: time.Duration(prepSeconds) * time.Second,
@@ -98,10 +105,13 @@ func NewEngine(p preset.Preset, prepSeconds int, targetCycles int) *Engine {
 	return e
 }
 
-// SetPreset updates the active preset and recomputes the target cycles if needed.
-func (e *Engine) SetPreset(p preset.Preset) {
+// SetPreset updates the active preset and recomputes the target cycle count.
+// A positive cyclesOverride (from the CLI) takes precedence over the preset's
+// own cycle count.
+func (e *Engine) SetPreset(p preset.Preset, cyclesOverride int) {
 	e.Preset = p
-	if p.Cycles > 0 && e.TargetCycles == 0 {
+	e.TargetCycles = cyclesOverride
+	if e.TargetCycles <= 0 {
 		e.TargetCycles = p.Cycles
 	}
 }
@@ -241,9 +251,10 @@ func (e *Engine) firstValidPhase() Phase {
 }
 
 // advancePhase moves to the next non-zero duration phase or increments cycle.
+// The cycle boundary is handled exactly once, in the check below; the skip
+// loop can never reach HoldOut from a phase this check has not already
+// covered, so it must not repeat the cycle counting.
 func (e *Engine) advancePhase() {
-	next := e.nextPhase(e.CurrentPhase)
-
 	// If we completed HoldOut (or completed Exhale when HoldOut is 0), cycle has ended
 	if (e.CurrentPhase == PhaseHoldOut) || (e.CurrentPhase == PhaseExhale && e.PhaseDuration(PhaseHoldOut) <= 0) {
 		if e.TargetCycles > 0 && e.CurrentCycle >= e.TargetCycles {
@@ -254,14 +265,8 @@ func (e *Engine) advancePhase() {
 	}
 
 	// Skip any phases with 0 duration
+	next := e.nextPhase(e.CurrentPhase)
 	for next != PhaseDone && e.PhaseDuration(next) <= 0 {
-		if next == PhaseHoldOut {
-			if e.TargetCycles > 0 && e.CurrentCycle >= e.TargetCycles {
-				e.CurrentPhase = PhaseDone
-				return
-			}
-			e.CurrentCycle++
-		}
 		next = e.nextPhase(next)
 	}
 

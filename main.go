@@ -123,10 +123,10 @@ func main() {
 		cfg.Style = flagStyle
 	}
 	if flagFPS > 0 {
-		cfg.FPS = flagFPS
+		cfg.FPS = config.ClampFPS(flagFPS)
 	}
-	if flagSound {
-		cfg.Sound = true
+	if flags.Changed("sound") {
+		cfg.Sound = flagSound
 	}
 
 	allPresets := preset.AllPresets(cfg.Presets)
@@ -253,6 +253,7 @@ func printUsage() {
 	fmt.Println("  -p, --preset string   Name of the breathing preset to use")
 	fmt.Println("  -i, --inhale float    Custom inhale duration in seconds")
 	fmt.Println("      --hold-in float   Custom hold-after-inhale duration in seconds")
+	fmt.Println("      --hold float      Alias for --hold-in")
 	fmt.Println("  -e, --exhale float    Custom exhale duration in seconds")
 	fmt.Println("      --hold-out float  Custom hold-after-exhale duration in seconds")
 	fmt.Println("  -c, --cycles int      Total breathing cycles (default 0 = continuous)")

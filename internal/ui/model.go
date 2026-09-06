@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -24,19 +25,27 @@ func tickCmd(fps int) tea.Cmd {
 	})
 }
 
+// bellCmd rings the terminal bell. It is returned as a tea.Cmd so the write
+// is sequenced by the event loop instead of racing the renderer goroutine.
+func bellCmd() tea.Msg {
+	fmt.Print("\a")
+	return nil
+}
+
 // Model represents the Bubble Tea UI state.
 type Model struct {
-	Engine       *breath.Engine
-	Presets      []preset.Preset
-	PresetIndex  int
-	Config       *config.Config
-	Theme        Theme
-	Style        string
-	Width        int
-	Height       int
-	ShowHelp     bool
-	SoundEnabled bool
-	Quitting     bool
+	Engine         *breath.Engine
+	Presets        []preset.Preset
+	PresetIndex    int
+	Config         *config.Config
+	Theme          Theme
+	Style          string
+	Width          int
+	Height         int
+	ShowHelp       bool
+	SoundEnabled   bool
+	Quitting       bool
+	CyclesOverride int
 }
 
 // NewModel initializes the Bubble Tea model with configuration and initial preset.
@@ -53,13 +62,14 @@ func NewModel(cfg *config.Config, initialPreset preset.Preset, allPresets []pres
 	engine := breath.NewEngine(initialPreset, cfg.PrepSeconds, cyclesOverride)
 
 	return Model{
-		Engine:       engine,
-		Presets:      allPresets,
-		PresetIndex:  initialIndex,
-		Config:       cfg,
-		Theme:        theme,
-		Style:        cfg.Style,
-		SoundEnabled: cfg.Sound,
+		Engine:         engine,
+		Presets:        allPresets,
+		PresetIndex:    initialIndex,
+		Config:         cfg,
+		Theme:          theme,
+		Style:          cfg.Style,
+		SoundEnabled:   cfg.Sound,
+		CyclesOverride: cyclesOverride,
 	}
 }
 
@@ -82,14 +92,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		transitioned := m.Engine.Update(time.Time(msg))
 		if transitioned && m.SoundEnabled {
-			// Trigger terminal bell
-			fmt.Print("\a")
+			return m, tea.Batch(tickCmd(m.Config.FPS), bellCmd)
 		}
 		return m, tickCmd(m.Config.FPS)
 
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "ctrl+c", "esc":
+		case "esc":
+			// The help modal documents Esc as its dismiss key.
+			if m.ShowHelp {
+				m.ShowHelp = false
+				return m, nil
+			}
+			m.Quitting = true
+			return m, tea.Quit
+
+		case "q", "ctrl+c":
 			m.Quitting = true
 			return m, tea.Quit
 
@@ -100,7 +118,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "p", "tab":
 			if len(m.Presets) > 1 {
 				m.PresetIndex = (m.PresetIndex + 1) % len(m.Presets)
-				m.Engine.SetPreset(m.Presets[m.PresetIndex])
+				m.Engine.SetPreset(m.Presets[m.PresetIndex], m.CyclesOverride)
 				m.Engine.Restart()
 			}
 			return m, nil
@@ -108,7 +126,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "P", "shift+tab":
 			if len(m.Presets) > 1 {
 				m.PresetIndex = (m.PresetIndex - 1 + len(m.Presets)) % len(m.Presets)
-				m.Engine.SetPreset(m.Presets[m.PresetIndex])
+				m.Engine.SetPreset(m.Presets[m.PresetIndex], m.CyclesOverride)
 				m.Engine.Restart()
 			}
 			return m, nil
@@ -215,8 +233,8 @@ func (m Model) renderCircleArea() string {
 	circleHeight := m.Height - 11
 	if circleHeight > 22 {
 		circleHeight = 22
-	} else if circleHeight < 9 {
-		circleHeight = 9
+	} else if circleHeight < minCircleHeight {
+		circleHeight = minCircleHeight
 	}
 
 	circleWidth := int(float64(circleHeight)*m.Config.AspectRatio) + 4
@@ -231,7 +249,9 @@ func (m Model) renderCircleArea() string {
 
 	phaseLabel := m.Engine.CurrentPhase.String()
 	timeRemaining := m.Engine.PhaseTimeRemaining()
-	timeLabel := fmt.Sprintf("%.1fs", timeRemaining)
+	// Round the countdown up so it ticks naturally into the transition
+	// instead of dwelling on 0.0s for the final fraction of a second.
+	timeLabel := fmt.Sprintf("%.1fs", math.Ceil(timeRemaining*10)/10)
 
 	if m.Engine.Paused {
 		phaseLabel = "PAUSED"

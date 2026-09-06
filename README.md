@@ -114,7 +114,7 @@ While `brth` is running, you can control the experience directly with your keybo
 | `s` | Cycle visual style (`braille-ring` → `braille-fill` → `block` → `ascii`) |
 | `r` | Restart session from cycle 1 |
 | `?` / `h` | Toggle keyboard shortcuts help overlay |
-| `q` / `Esc` / `Ctrl+C` | Quit and restore terminal |
+| `q` / `Esc` / `Ctrl+C` | Quit and restore terminal (`Esc` closes the help overlay when open) |
 
 ---
 
@@ -149,7 +149,7 @@ style: "braille-ring"
 # Target animation framerate (15-60)
 fps: 30
 
-# Character aspect ratio correction (width / height of terminal font)
+# Character aspect ratio correction (height / width of terminal font)
 aspect_ratio: 2.0
 
 # Terminal bell on phase change
@@ -189,6 +189,7 @@ Flags:
   -p, --preset string   Name of the breathing preset to use
   -i, --inhale float    Custom inhale duration in seconds
       --hold-in float   Custom hold-after-inhale duration in seconds
+      --hold float      Alias for --hold-in
   -e, --exhale float    Custom exhale duration in seconds
       --hold-out float  Custom hold-after-exhale duration in seconds
   -c, --cycles int      Total breathing cycles (default 0 = continuous)
